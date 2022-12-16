@@ -3,8 +3,7 @@ import { StatusBar } from 'expo-status-bar'
 import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
 import { Image, Input, Button } from '@rneui/base'
 
-
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,7 +18,7 @@ const LoginScreen = () => {
         style={styles.imageContainer}
         source={{
           uri:
-            'https://cdn-icons-png.flaticon.com/512/124/124034.png?w=826&t=st=1671123292~exp=1671123892~hmac=51ec1799fd702d2ec56a965bc20be8ae200aa68966c5738efa231179ea9d2e69',
+            'https://seeklogo.com/images/W/whatsapp-logo-8AE44BBBB0-seeklogo.com.png',
         }}
       />
       <View style={styles.inputContainer}>
@@ -40,19 +39,20 @@ const LoginScreen = () => {
       </View>
 
       <Button 
+        onPress={signIn}
         title="Login" 
         containerStyle={styles.button}
-        onPress={signIn}
         color= "#25D366"
       />
       <Button 
+        onPress={() => navigation.navigate('Register')}
         title="Register"
         containerStyle={styles.button}
         type="outline"
         titleStyle={{ color: "#25D366" }}
         buttonStyle={{ borderColor: "#25D366" }}
       />
-      <View style={{ height: 100 }}/>
+      
 
     </KeyboardAvoidingView>
   )
@@ -63,7 +63,7 @@ export default LoginScreen
 const styles = StyleSheet.create({
   imageContainer: {
     width:150,
-    height:150, 
+    height:150,
     borderTopLeftRadius: 40,
     borderBottomRightRadius: 40,
     shadowColor: "#000",
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-  imageContainer: {
-    marginBottom: 100,
-  },
+  // imageContainer: {
+  //   marginBottom: 100,
+  // },
 });
