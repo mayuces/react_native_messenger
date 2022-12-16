@@ -1,7 +1,8 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react'
+import React, { useState, useLayoutEffect } from 'react'
 import { StyleSheet, KeyboardAvoidingView, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar';
 import { Text, Input, Button, color } from '@rneui/base'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -9,14 +10,22 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [imageUrl, setImageUrl] = useState('');
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerBackTitle: 'Back to Login',
     });
   }, [navigation])
 
-  const register = () => {
+  const register = async () => {
+    const auth = getAuth();
 
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then(authUser => {
+        authUser.user.update({
+          displayName: name,
+          photoURL: imageUrl || 'https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg',
+        })
+      }).catch(error => alert(error.message));
   };
 
   return (

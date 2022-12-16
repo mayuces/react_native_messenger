@@ -1,11 +1,26 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
 import { Image, Input, Button } from '@rneui/base'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        navigation.replace('Home');
+      }
+    });
+
+    return unsubscribe;
+  }, [])
+  
 
   const signIn = () => {
 
@@ -93,8 +108,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 10,
   },
-
-  // imageContainer: {
-  //   marginBottom: 100,
-  // },
 });
