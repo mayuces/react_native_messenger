@@ -21,7 +21,7 @@ const RegisterScreen = ({ navigation }) => {
 
     await createUserWithEmailAndPassword(auth, email, password)
       .then(authUser => {
-        authUser.user.update({
+        authUser.user.updateProfile({
           displayName: name,
           photoURL: imageUrl || 'https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg',
         })

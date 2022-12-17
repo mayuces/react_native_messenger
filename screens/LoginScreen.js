@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
 import { Image, Input, Button } from '@rneui/base'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase'
 
 
 const LoginScreen = ({ navigation }) => {
@@ -10,10 +10,10 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const auth = getAuth();
 
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
+        console.log(authUser);
         navigation.replace('Home');
       }
     });

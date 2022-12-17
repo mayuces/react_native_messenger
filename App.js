@@ -21,9 +21,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={globalScreenOptions}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{headerTitleAlign: "center"}}/>
+        <Stack.Screen name="Register" component={RegisterScreen} options={{headerTitleAlign: "center"}}/>
+        <Stack.Screen name="Home" component={HomeScreen} options={{headerTitleAlign: "center"}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
