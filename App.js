@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";
+import AddChatScreen from "./screens/AddChatScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,10 +21,30 @@ const globalScreenOptions = {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={globalScreenOptions}>
-        <Stack.Screen name="Login" component={LoginScreen} options={{headerTitleAlign: "center"}}/>
-        <Stack.Screen name="Register" component={RegisterScreen} options={{headerTitleAlign: "center"}}/>
-        <Stack.Screen name="Home" component={HomeScreen} options={{headerTitleAlign: "center"}}/>
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={globalScreenOptions}
+      >
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerTitleAlign: "center" }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerTitleAlign: "center" }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerTitleAlign: "center" }}
+        />
+        <Stack.Screen
+          name="AddChat"
+          component={AddChatScreen}
+          options={{ headerTitleAlign: "center" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
