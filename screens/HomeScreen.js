@@ -28,21 +28,19 @@ const HomeScreen = ({ navigation }) => {
 
       const docsSnap = await getDocs(colRef);
 
+      const newChats = [];
+
       docsSnap.forEach((doc) => {
-        const newChats = [
-          ...chats,
-          {
-            id: doc.id,
-            data: doc.data(),
-          },
-        ];
+        newChats.push({
+          id: doc.id,
+          data: doc.data(),
+        });
       });
 
       setChats([...newChats]);
     };
 
     fetchChats();
-    console.log("chats:" + chats);
   }, []);
 
   useLayoutEffect(() => {
@@ -78,11 +76,23 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [navigation]);
 
+  const enterChat = (id, chatName) => {
+    navigation.navigate("Chat", {
+      id,
+      chatName,
+    });
+  };
+
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView style={styles.container}>
         {chats.map(({ id, data: { chatName } }) => (
-          <CustomListItem key={id} id={id} chatName={chatName} />
+          <CustomListItem
+            key={id}
+            id={id}
+            chatName={chatName}
+            enterChat={enterChat}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -91,4 +101,8 @@ const HomeScreen = ({ navigation }) => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+  },
+});

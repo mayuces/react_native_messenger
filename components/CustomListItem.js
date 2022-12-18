@@ -5,7 +5,7 @@ import { auth, db } from "../firebase";
 
 const CustomListItem = ({ id, chatName, enterChat }) => {
   return (
-    <ListItem key={id} bottomDivider>
+    <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
       <Avatar
         rounded
         source={{
