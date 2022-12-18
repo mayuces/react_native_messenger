@@ -16,15 +16,6 @@ const AddChatScreen = ({ navigation }) => {
   }, []);
 
   const createChat = async () => {
-    // await db
-    //   .collection("chats")
-    //   .add({
-    //     chatName: input,
-    //   })
-    //   .then(() => {
-    //     navigation.goBack();
-    //   })
-    //   .catch((error) => alert(error));
     try {
       const formData = {
         chatName: input,
@@ -43,6 +34,7 @@ const AddChatScreen = ({ navigation }) => {
         placeholder="Enter a chat name"
         value={input}
         onChangeText={(text) => setInput(text)}
+        onSubmitEditing={createChat}
         leftIcon={
           <Icon name="wechat" type="antdesign" size={24} color="black" />
         }
@@ -55,5 +47,9 @@ const AddChatScreen = ({ navigation }) => {
 export default AddChatScreen;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    backgroundColor: "white",
+    padding: 30,
+    height: "100%",
+  },
 });
