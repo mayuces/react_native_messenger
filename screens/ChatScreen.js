@@ -26,12 +26,16 @@ import {
   addDoc,
   collection,
   doc,
+  getDocs,
+  orderBy,
+  query,
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
 
 const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -86,6 +90,10 @@ const ChatScreen = ({ navigation, route }) => {
   const sendMessage = async () => {
     Keyboard.dismiss();
 
+    if (input === "") {
+      return;
+    }
+
     const docData = {
       message: input,
       timestamp: serverTimestamp(),
@@ -99,17 +107,84 @@ const ChatScreen = ({ navigation, route }) => {
     setInput("");
   };
 
+  useLayoutEffect(() => {
+    const fetchMessages = async () => {
+      const colRef = collection(db, "chats", route.params.id, "messages");
+      const q = query(colRef, orderBy("timestamp", "asc"));
+
+      const docsSnap = await getDocs(q);
+
+      const newMessages = [];
+
+      docsSnap.forEach((doc) => {
+        newMessages.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+
+      setMessages([...newMessages]);
+    };
+
+    fetchMessages();
+  }, [route]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
-        keyboardVerticalOffset={130}
+        keyboardVerticalOffset={150}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView></ScrollView>
+            <ScrollView>
+              {messages.map(({ id, data }) =>
+                data.email === auth.currentUser.email ? (
+                  <View key={id} style={styles.reciever}>
+                    <Avatar
+                      position="absolute"
+                      rounded
+                      // WEB
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: -5,
+                      }}
+                      bottom={-15}
+                      right={-5}
+                      size={30}
+                      source={{
+                        uri: data.photoURL,
+                      }}
+                    />
+                    <Text style={styles.recieverText}>{data.message}</Text>
+                  </View>
+                ) : (
+                  <View key={id} style={styles.sender}>
+                    <Avatar
+                      position="absolute"
+                      rounded
+                      // WEB
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: -5,
+                      }}
+                      bottom={-15}
+                      right={-5}
+                      size={30}
+                      source={{
+                        uri: data.photoURL,
+                      }}
+                    />
+                    <Text style={styles.senderText}>{data.message}</Text>
+                    <Text style={styles.senderName}>{data.displayName}</Text>
+                  </View>
+                )
+              )}
+            </ScrollView>
             <View style={styles.footer}>
               <TextInput
                 value={input}
@@ -135,6 +210,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  reciever: {
+    padding: 15,
+    backgroundColor: "#ECECEC",
+    alignSelf: "flex-end",
+    marginRight: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+    borderRadius: 20,
+  },
+  recieverText: {
+    color: "black",
+    fontWeight: "500",
+    marginLeft: 10,
+  },
+  sender: {
+    alignSelf: "flex-start",
+    backgroundColor: "#25D366",
+    borderRadius: 20,
+    margin: 15,
+    maxWidth: "80%",
+    position: "relative",
+    padding: 15,
+  },
+  senderText: {
+    color: "white",
+    fontWeight: "500",
+    marginLeft: 10,
+    marginBottom: 15,
+  },
+
+  senderName: {
+    color: "white",
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+  },
+
   footer: {
     flexDirection: "row",
     alignItems: "center",
