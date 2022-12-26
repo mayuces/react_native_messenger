@@ -1,4 +1,5 @@
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -8,9 +9,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import {
   AntDesign,
   SimpleLineIcons,
@@ -19,6 +21,14 @@ import {
 } from "react-native-vector-icons";
 
 import { Avatar } from "@rneui/base";
+import { auth, db } from "../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 
 const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState("");
@@ -73,7 +83,21 @@ const ChatScreen = ({ navigation, route }) => {
     });
   }, [navigation]);
 
-  const sendMessage = () => {};
+  const sendMessage = async () => {
+    Keyboard.dismiss();
+
+    const docData = {
+      message: input,
+      timestamp: serverTimestamp(),
+      displayName: auth.currentUser.displayName,
+      email: auth.currentUser.email,
+      photoURL: auth.currentUser.photoURL,
+    };
+
+    await addDoc(collection(db, "chats", route.params.id, "messages"), docData);
+
+    setInput("");
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -83,20 +107,23 @@ const ChatScreen = ({ navigation, route }) => {
         style={styles.container}
         keyboardVerticalOffset={130}
       >
-        <>
-          <ScrollView></ScrollView>
-          <View style={styles.footer}>
-            <TextInput
-              value={input}
-              onChangeText={(text) => setInput(text)}
-              placeholder="Message"
-              style={styles.textInput}
-            />
-            <TouchableOpacity activeOpacity={0.5} onPress={sendMessage}>
-              <Ionicons name="send" size={24} color="#25D366" />
-            </TouchableOpacity>
-          </View>
-        </>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <>
+            <ScrollView></ScrollView>
+            <View style={styles.footer}>
+              <TextInput
+                value={input}
+                onChangeText={(text) => setInput(text)}
+                onSubmitEditing={sendMessage}
+                placeholder="Message"
+                style={styles.textInput}
+              />
+              <TouchableOpacity activeOpacity={0.5} onPress={sendMessage}>
+                <Ionicons name="send" size={24} color="#25D366" />
+              </TouchableOpacity>
+            </View>
+          </>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
