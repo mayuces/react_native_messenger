@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
   AntDesign,
   SimpleLineIcons,
@@ -52,7 +52,9 @@ const ChatScreen = ({ navigation, route }) => {
           <Avatar
             rounded
             source={{
-              uri: "https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg",
+              uri:
+                messages[messages.length - 1]?.data.photoURL ||
+                "https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg",
             }}
           />
           <Text
@@ -107,27 +109,49 @@ const ChatScreen = ({ navigation, route }) => {
     setInput("");
   };
 
-  useLayoutEffect(() => {
-    const fetchMessages = async () => {
-      const colRef = collection(db, "chats", route.params.id, "messages");
-      const q = query(colRef, orderBy("timestamp", "asc"));
+  const fetchMessages = async () => {
+    const colRef = collection(db, "chats", route.params.id, "messages");
+    const q = query(colRef, orderBy("timestamp", "asc"));
 
-      const docsSnap = await getDocs(q);
+    const docsSnap = await getDocs(q);
 
-      const newMessages = [];
+    const newMessages = [];
 
-      docsSnap.forEach((doc) => {
-        newMessages.push({
-          id: doc.id,
-          data: doc.data(),
-        });
+    docsSnap.forEach((doc) => {
+      newMessages.push({
+        id: doc.id,
+        data: doc.data(),
       });
+    });
 
-      setMessages([...newMessages]);
-    };
+    setMessages([...newMessages]);
+  };
 
+  useEffect(() => {
     fetchMessages();
-  }, [route]);
+  }, []);
+
+  // const fetchMessages = useMemo(async () => {
+  //   const colRef = collection(db, "chats", route.params.id, "messages");
+  //   const q = query(colRef, orderBy("timestamp", "asc"));
+
+  //   const docsSnap = await getDocs(q);
+
+  //   const newMessages = [];
+
+  //   docsSnap.forEach((doc) => {
+  //     newMessages.push({
+  //       id: doc.id,
+  //       data: doc.data(),
+  //     });
+  //   });
+
+  //   return newMessages;
+  // }, [route]);
+
+  // useEffect(() => {
+  //   setMessages([...fetchMessages]);
+  // }, [fetchMessages]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -139,7 +163,7 @@ const ChatScreen = ({ navigation, route }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView>
+            <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
               {messages.map(({ id, data }) =>
                 data.email === auth.currentUser.email ? (
                   <View key={id} style={styles.reciever}>
@@ -170,10 +194,10 @@ const ChatScreen = ({ navigation, route }) => {
                       containerStyle={{
                         position: "absolute",
                         bottom: -15,
-                        right: -5,
+                        left: -5,
                       }}
                       bottom={-15}
-                      right={-5}
+                      left={-5}
                       size={30}
                       source={{
                         uri: data.photoURL,

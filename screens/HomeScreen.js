@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState, useEffect } from "react";
+import React, { useLayoutEffect, useState, useEffect, useMemo } from "react";
 import {
   StyleSheet,
   Text,
@@ -22,26 +22,46 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
-  useEffect(() => {
-    const fetchChats = async () => {
-      const colRef = collection(db, "chats");
+  const fetchChats = async () => {
+    const colRef = collection(db, "chats");
 
-      const docsSnap = await getDocs(colRef);
+    const docsSnap = await getDocs(colRef);
 
-      const newChats = [];
+    const newChats = [];
 
-      docsSnap.forEach((doc) => {
-        newChats.push({
-          id: doc.id,
-          data: doc.data(),
-        });
+    docsSnap.forEach((doc) => {
+      newChats.push({
+        id: doc.id,
+        data: doc.data(),
       });
+    });
 
-      setChats([...newChats]);
-    };
-
+    setChats([...newChats]);
+  };
+  useEffect(() => {
     fetchChats();
   }, []);
+
+  // const fetchChats = useMemo(async () => {
+  //   const colRef = collection(db, "chats");
+
+  //   const docsSnap = await getDocs(colRef);
+
+  //   const newChats = [];
+
+  //   docsSnap.forEach((doc) => {
+  //     newChats.push({
+  //       id: doc.id,
+  //       data: doc.data(),
+  //     });
+  //   });
+
+  //   return newChats;
+  // }, []);
+
+  // useEffect(() => {
+  //   setChats([...fetchChats]);
+  // }, [fetchChats]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
