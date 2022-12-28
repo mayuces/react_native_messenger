@@ -12,7 +12,13 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   AntDesign,
   SimpleLineIcons,
@@ -27,15 +33,19 @@ import {
   collection,
   doc,
   getDocs,
+  onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
+import { async } from "@firebase/util";
 
 const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
+
+  let messageViewRef = null;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -109,49 +119,27 @@ const ChatScreen = ({ navigation, route }) => {
     setInput("");
   };
 
-  const fetchMessages = async () => {
+  useEffect(() => {
     const colRef = collection(db, "chats", route.params.id, "messages");
     const q = query(colRef, orderBy("timestamp", "asc"));
 
-    const docsSnap = await getDocs(q);
-
-    const newMessages = [];
-
-    docsSnap.forEach((doc) => {
-      newMessages.push({
-        id: doc.id,
-        data: doc.data(),
-      });
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setMessages(
+        snapshot.docs.map((doc) => ({
+          data: doc.data(),
+          id: doc.id,
+        }))
+      );
     });
 
-    setMessages([...newMessages]);
-  };
-
-  useEffect(() => {
-    fetchMessages();
+    return unsubscribe;
   }, []);
 
-  // const fetchMessages = useMemo(async () => {
-  //   const colRef = collection(db, "chats", route.params.id, "messages");
-  //   const q = query(colRef, orderBy("timestamp", "asc"));
-
-  //   const docsSnap = await getDocs(q);
-
-  //   const newMessages = [];
-
-  //   docsSnap.forEach((doc) => {
-  //     newMessages.push({
-  //       id: doc.id,
-  //       data: doc.data(),
-  //     });
-  //   });
-
-  //   return newMessages;
-  // }, [route]);
-
-  // useEffect(() => {
-  //   setMessages([...fetchMessages]);
-  // }, [fetchMessages]);
+  useEffect(() => {
+    if (messageViewRef) {
+      messageViewRef.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -163,7 +151,10 @@ const ChatScreen = ({ navigation, route }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
+            <ScrollView
+              contentContainerStyle={{ paddingTop: 15 }}
+              ref={(ref) => (messageViewRef = ref)}
+            >
               {messages.map(({ id, data }) =>
                 data.email === auth.currentUser.email ? (
                   <View key={id} style={styles.reciever}>

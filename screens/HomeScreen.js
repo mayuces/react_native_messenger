@@ -12,6 +12,7 @@ import { Avatar } from "@rneui/base";
 import { auth, db } from "../firebase";
 import { AntDesign, SimpleLineIcons } from "react-native-vector-icons";
 import { getDoc, doc, query, collection, getDocs } from "firebase/firestore";
+import { async } from "@firebase/util";
 
 const HomeScreen = ({ navigation }) => {
   const [chats, setChats] = useState([]);
@@ -23,45 +24,37 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const fetchChats = async () => {
-    const colRef = collection(db, "chats");
+    try {
+      const colRef = collection(db, "chats");
 
-    const docsSnap = await getDocs(colRef);
+      const docsSnap = await getDocs(colRef);
 
-    const newChats = [];
+      const chats = [];
 
-    docsSnap.forEach((doc) => {
-      newChats.push({
-        id: doc.id,
-        data: doc.data(),
+      docsSnap.forEach((doc) => {
+        return chats.push({
+          id: doc.id,
+          data: doc.data(),
+        });
       });
-    });
 
-    setChats([...newChats]);
+      setChats(chats);
+    } catch (error) {
+      console.log("chats couldnt fetched");
+    }
   };
   useEffect(() => {
     fetchChats();
   }, []);
 
-  // const fetchChats = useMemo(async () => {
-  //   const colRef = collection(db, "chats");
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Fetch the chats again when the component is focused
+      fetchChats();
+    });
 
-  //   const docsSnap = await getDocs(colRef);
-
-  //   const newChats = [];
-
-  //   docsSnap.forEach((doc) => {
-  //     newChats.push({
-  //       id: doc.id,
-  //       data: doc.data(),
-  //     });
-  //   });
-
-  //   return newChats;
-  // }, []);
-
-  // useEffect(() => {
-  //   setChats([...fetchChats]);
-  // }, [fetchChats]);
+    return unsubscribe;
+  }, [navigation]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
